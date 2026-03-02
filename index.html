@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dabo Vision Global</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; overflow-x: hidden; }
+        .oro { color: #D4AF37; font-weight: bold; }
+        /* Cuadro de Bienvenida */
+        #bienvenida {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .caja { border: 2px solid #D4AF37; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px; }
+        button { background: #D4AF37; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="bienvenida">
+        <div class="caja">
+            <p style="font-size: 1.2rem; line-height: 1.6; font-style: italic;">
+                “Bienvenido a <span class="oro">Dabo Vision Global</span> el Futuro<br>
+                Disfruta De tus Gustos Favoritos<br>
+                Gracias 🙏”
+            </p>
+            <button onclick="document.getElementById('bienvenida').style.display='none'">ENTRAR</button>
+        </div>
+    </div>
+
+    <h1 class="oro" style="margin-top: 100px;">DABO VISION GLOBAL</h1>
+    <div id="peliculas" style="display: flex; gap: 10px; overflow-x: auto; padding: 20px;">
+        <p>Cargando cartelera VIP para Dieyna...</p>
+    </div>
+
+    <script>
+        // Este código trae las películas automáticamente
+        async function traerCine() {
+            const res = await fetch('https://api.themoviedb.org/3/trending/movie/day?api_key=4feb633198539e05f24204d80d19f6a1&language=es-ES');
+            const data = await res.json();
+            const box = document.getElementById('peliculas');
+            box.innerHTML = '';
+            data.results.forEach(m => {
+                const img = document.createElement('img');
+                img.src = `https://image.tmdb.org/t/p/w200${m.poster_path}`;
+                img.style.borderRadius = '10px';
+                img.style.height = '200px';
+                box.appendChild(img);
+            });
+        }
+        traerCine();
+    </script>
+</body>
+</html>
