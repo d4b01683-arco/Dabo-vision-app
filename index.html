@@ -2,50 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dabo Vision Global</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; text-align: center; overflow-x: hidden; }
-        .oro { color: #D4AF37; font-weight: bold; }
-        /* Cuadro de Bienvenida */
-        #bienvenida {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: flex; align-items: center; justify-content: center; z-index: 9999;
-        }
-        .caja { border: 2px solid #D4AF37; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px; }
-        button { background: #D4AF37; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        :root { --gold: #D4AF37; --glass: rgba(0, 0, 0, 0.6); }
+        body { background-color: #000; color: #fff; font-family: 'Orbitron', sans-serif; margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent; transition: background 1s ease-in-out; }
+        #night-filter { position: fixed; inset: 0; background: rgba(255, 145, 0, 0.08); pointer-events: none; z-index: 200000; display: none; mix-blend-mode: multiply; }
+        #bg-dinamico { position: fixed; inset: 0; z-index: -2; background-size: cover; background-position: center; filter: brightness(0.3) blur(10px); transition: 2s; }
+        #particles-js { position: fixed; inset: 0; z-index: -1; pointer-events: none; transition: 1s; }
+        .movie-card { min-width: 130px; height: 190px; border-radius: 15px; background-size: cover; background-position: center; flex-shrink: 0; position: relative; border: 1px solid rgba(212,175,55,0.15); transition: 0.4s; cursor: pointer; -webkit-box-reflect: below 5px linear-gradient(transparent, transparent, rgba(255,255,255,0.1)); }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 24px; padding: 25px; margin-bottom: 15px; }
+        .dv-logo { position: fixed; top: 25px; left: 20px; z-index: 100000; font-size: 26px; font-weight: 900; color: var(--gold); cursor: pointer; user-select: none; text-shadow: 0 0 10px rgba(212,175,55,0.5); padding: 10px; }
+        .tier-btn { background: linear-gradient(90deg, #B8860B, #D4AF37) !important; color: #000 !important; font-weight: 800; padding: 18px; border-radius: 12px; width: 100%; cursor: pointer; border: none; text-transform: uppercase; font-size: 11px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
+        .video-row { display: flex; gap: 14px; overflow-x: auto; padding: 0 20px 80px 20px; scroll-behavior: smooth; }
+        #progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.1); z-index: 100; }
+        #progress-bar { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: 0.5s; }
+        .fav-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--gold); border: 1px solid var(--gold); z-index: 10; }
+        #video-overlay, #series-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 80000; flex-direction: column; overflow-y: auto; backdrop-filter: blur(15px); }
+        .back-btn { background: rgba(255,255,255,0.05); padding: 12px 24px; border-radius: 50px; font-size: 10px; font-weight: 900; color: #fff; border: 1px solid var(--gold); cursor: pointer; text-transform: uppercase; }
+        .input-gold { background: rgba(255,255,255,0.07); border: 1px solid rgba(212, 175, 55, 0.3); color: #fff; padding: 14px; border-radius: 12px; width: 100%; margin-bottom: 12px; outline: none; }
+        #vault-ui { display: none; position: fixed; inset: 0; background: #000; z-index: 90000; padding: 30px; overflow-y: auto; }
+        .gold-blast { position: absolute; border: 2px solid var(--gold); border-radius: 50%; pointer-events: none; animation: blast 0.8s ease-out forwards; opacity: 0; }
+        @keyframes blast { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 500px; height: 500px; opacity: 0; border-width: 0; } }
+        #welcome-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300000; align-items: center; justify-content: center; padding: 20px; }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
+    <div id="night-filter"></div>
+    <audio id="audio-ambiente" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
+    <div id="bg-dinamico"></div>
+    <div id="particles-js"></div>
+    <div class="dv-logo" id="mainLogo">DV</div>
 
-    
-<div id="bienvenida" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:9999;">
-    <div style="border:2px solid #D4AF37; padding:30px; border-radius:20px; text-align:center; width:80%;">
-        <p style="color:white; font-size:1.2rem;">
-            “Bienvenido a <span style="color:#D4AF37;">Dabo Vision Global</span> el Futuro<br>
-            Disfruta De tus Gustos Favoritos<br>
-            Gracias 🙏”
-        </p>
-        <button onclick="this.parentElement.parentElement.style.display='none'" style="background:#D4AF37; color:black; padding:10px 20px; border-radius:50px; font-weight:bold; border:none; margin-top:20px;">ENTRAR</button>
+    <div id="welcome-modal">
+        <div class="glass-panel w-full max-w-[400px] text-center border-gold border-2 py-10">
+            <div class="text-gold text-4xl mb-6">🙏</div>
+            <p class="text-white text-lg font-bold leading-relaxed mb-8 italic">“Bienvenido a Dabo Vision Global el Futuro<br>Disfruta De tus Gustos Favoritos<br>Gracias 🙏”</p>
+            <button onclick="cerrarBienvenida()" class="tier-btn !justify-center w-40 mx-auto">DISFRUTAR</button>
+        </div>
     </div>
-</div>
 
+    <div id="paywall" class="fixed inset-0 z-[5000] flex flex-col items-center justify-start pt-16 px-6 overflow-y-auto bg-transparent pb-20">
+        <h1 class="text-white text-3xl font-black italic mb-2">DABO VISION GLOBAL</h1>
+        <div class="glass-panel w-full max-w-[380px] text-center mb-8"><p class="text-xl text-white italic" style="font-family:'Playfair Display'">"Bienvenido al nuevo mundo, Dieyna"</p></div>
+        <div class="w-full max-w-[350px] space-y-4">
+            <button class="tier-btn"><span>Nivel 1 Bronce</span> <span>$9.99</span></button>
+            <button class="tier-btn"><span>Nivel 2 Plata</span> <span>$24.99</span></button>
+            <button class="tier-btn"><span>Nivel 3 Oro Élite</span> <span>$90.99</span></button>
+        </div>
+        <div class="w-full max-w-[350px] mt-10 pt-8 border-t border-gold/30 text-center">
+            <input type="text" id="user-login" class="input-gold" placeholder="Usuario">
+            <input type="password" id="pass-login" class="input-gold" placeholder="Contraseña">
+            <button class="tier-btn !justify-center" onclick="validarAcceso()">ENTRAR</button>
+        </div>
+    </div>
+
+    <div id="app-ui" class="hidden pt-28 pb-10">
+        <div class="fixed top-6 right-5 z-[7000] flex gap-3">
+            <button onclick="toggleNight()" class="text-[10px] text-gold border border-gold/40 px-5 py-2 rounded-full bg-black/80 font-black">🌙 MODO</button>
+            <button onclick="cerrarSesion()" class="text-[10px] text-gold border border-gold/40 px-5 py-2 rounded-full bg-black/80 font-black">SALIR ⏻</button>
+        </div>
+        <input type="text" id="search" class="w-[90%] mx-auto block bg-black/40 border border-gold/30 p-5 rounded-2xl mb-8 text-center text-white backdrop-blur-md" placeholder="BUSCAR..." onkeyup="buscar(this.value)">
+        <div id="favorites-section" class="hidden"><h3 class="px-6 text-[11px] font-black uppercase text-gold mb-4 italic tracking-widest">Mi Lista VIP</h3><div id="fav-row" class="video-row mb-10"></div></div>
+        <div id="catalog"></div>
+    </div>
+
+    <div id="video-overlay">
+        <div class="p-6 flex justify-between items-center bg-black/80">
+            <button onclick="cerrarVideo()" class="back-btn">← CERRAR</button>
+            <button onclick="descargarVideo()" class="text-[10px] text-gold border border-gold/40 px-4 py-2 rounded-full font-bold">⬇️ DESCARGAR (<span id="dl-count">5</span>)</button>
+        </div>
+        <div id="player-frame" class="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"></div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
+    </div>
+
+    <div id="vault-ui">
+        <div class="flex justify-between items-center mb-10"><h1 class="text-gold font-black text-2xl">BÓVEDA ANALÍTICA</h1><button onclick="document.getElementById('vault-ui').style.display='none'" class="back-btn">CERRAR</button></div>
+        <div class="glass-panel p-8 text-center"><p class="text-gray-500 text-[10px] uppercase">Capital Total</p><p class="text-5xl font-black text-white">$ 1,240.50</p></div>
+    </div>
+
+    <div id="series-overlay"><div class="p-6 flex justify-between items-center bg-black/95 sticky top-0 z-10 border-b border-gold/20"><button onclick="document.getElementById('series-overlay').style.display='none'" class="back-btn">← VOLVER</button><h2 id="series-title" class="text-gold font-bold text-xs uppercase tracking-widest"></h2></div><div id="series-content" class="p-5"></div></div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        // Este código trae las películas automáticamente
-        async function traerCine() {
-            const res = await fetch('https://api.themoviedb.org/3/trending/movie/day?api_key=4feb633198539e05f24204d80d19f6a1&language=es-ES');
-            const data = await res.json();
-            const box = document.getElementById('peliculas');
-            box.innerHTML = '';
-            data.results.forEach(m => {
-                const img = document.createElement('img');
-                img.src = `https://image.tmdb.org/t/p/w200${m.poster_path}`;
-                img.style.borderRadius = '10px';
-                img.style.height = '200px';
-                box.appendChild(img);
-            });
+        const API = 'a6178823f5e2f865dfd88e8cade51391';
+        const cats = [
+            {n:'Estrenos Nuevos', id:'now_playing', t:'movie'}, {n:'Animes', id:16, t:'discover'}, {n:'Series VIP', id:'top_rated', t:'tv'}, {n:'Películas Tendencia', id:'popular', t:'movie'},
+            {n:'Acción Élite', id:28, t:'discover'}, {n:'Comedia', id:35, t:'discover'}, {n:'Terror', id:27, t:'discover'}, {n:'Fantasías', id:14, t:'discover'},
+            {n:'Historias', id:36, t:'discover'}, {n:'Ciencia Ficción', id:878, t:'discover'}, {n:'Humor & StandUp', id:10751, t:'discover'}, {n:'Colección Universal', id:'trending', t:'all'}
+        ];
+
+        const bg = document.getElementById('bg-dinamico');
+        const audio = document.getElementById('audio-ambiente');
+        let favorites = JSON.parse(localStorage.getItem('dabo_favs')) || [];
+        
+        // SISTEMA DE DESCARGAS
+        let downloadData = JSON.parse(localStorage.getItem('dabo_downloads')) || { count: 5, date: new Date().toLocaleDateString() };
+        if(downloadData.date !== new Date().toLocaleDateString()) downloadData = { count: 5, date: new Date().toLocaleDateString() };
+        document.getElementById('dl-count').innerText = downloadData.count;
+
+        bg.style.backgroundImage = "url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop')";
+        particlesJS('particles-js', { particles: { number: { value: 30 }, color: { value: '#D4AF37' }, opacity: { value: 0.3 }, size: { value: 1.5 }, line_linked: { enable: true, distance: 150, color: '#D4AF37', opacity: 0.1 }, move: { enable: true, speed: 1.5 } } });
+
+        let clicks = 0; let startX = 0;
+        document.getElementById('mainLogo').addEventListener('click', function() {
+            clicks++; if(clicks === 3) {
+                this.style.color = "#fff";
+                window.addEventListener('touchstart', (e) => startX = e.touches[0].clientX, {once: true});
+                window.addEventListener('touchend', (e) => {
+                    if(e.changedTouches[0].clientX - startX > 80 && prompt("PIN ARQUITECTO:") === "110103") {
+                        audio.play().catch(()=>{}); document.getElementById('paywall').classList.add('hidden');
+                        document.getElementById('app-ui').classList.remove('hidden'); document.getElementById('vault-ui').style.display = 'block'; render();
+                    }
+                    clicks = 0; this.style.color = "#D4AF37";
+                }, {once: true});
+            }
+        });
+
+        function descargarVideo() {
+            if(downloadData.count > 0) {
+                downloadData.count--;
+                localStorage.setItem('dabo_downloads', JSON.stringify(downloadData));
+                document.getElementById('dl-count').innerText = downloadData.count;
+                alert("Sincronizando descarga con la nube de Dabo Vision... Espere por favor.");
+            } else { alert("Límite diario alcanzado (5/5). Vuelve mañana para más descargas."); }
         }
-        traerCine();
+
+        function toggleNight() { const f = document.getElementById('night-filter'); f.style.display = (f.style.display === 'block') ? 'none' : 'block'; }
+        function cerrarBienvenida() { document.getElementById('welcome-modal').style.display = 'none'; }
+        function cerrarSesion() { audio.pause(); audio.currentTime = 0; document.getElementById('app-ui').classList.add('hidden'); document.getElementById('paywall').classList.remove('hidden'); }
+        function validarAcceso() { if(!document.getElementById('user-login').value || !document.getElementById('pass-login').value) return; audio.play().catch(()=>{}); document.getElementById('welcome-modal').style.display = 'flex'; document.getElementById('paywall').classList.add('hidden'); document.getElementById('app-ui').classList.remove('hidden'); render(); }
+
+        async function render() {
+            updateFavRow(); const c = document.getElementById('catalog'); c.innerHTML = '';
+            bg.style.backgroundImage = "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop')";
+            for(const g of cats) {
+                const row = document.createElement('div');
+                row.innerHTML = `<h3 class="px-6 text-[10px] font-black uppercase text-gold mb-3 italic tracking-tighter">${g.n}</h3><div class="video-row" id="g-${g.id}"></div>`;
+                c.appendChild(row);
+                let url;
+                if(g.t === 'discover') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API}&with_genres=${g.id}&language=es-ES`;
+                else if(g.t === 'movie') url = `https://api.themoviedb.org/3/movie/${g.id}?api_key=${API}&language=es-ES`;
+                else if(g.t === 'tv') url = `https://api.themoviedb.org/3/tv/${g.id}?api_key=${API}&language=es-ES`;
+                else url = `https://api.themoviedb.org/3/trending/all/day?api_key=${API}&language=es-ES`;
+                fetch(url).then(r => r.json()).then(data => { document.getElementById(`g-${g.id}`).innerHTML = (data.results || []).map(m => cardHTML(m)).join(''); });
+            }
+        }
+
+        function cardHTML(m) {
+            const isFav = favorites.find(f => f.id === m.id); if(!m.poster_path) return '';
+            return `<div class="movie-card" onclick="detectarTipo(${m.id}, '${m.media_type || (m.name ? 'tv' : 'movie')}')" style="background-image:url('https://image.tmdb.org/t/p/w400${m.poster_path}')"><div class="fav-btn" onclick="event.stopPropagation(); toggleFav(${m.id}, '${m.poster_path}', '${m.media_type || (m.name ? 'tv' : 'movie')}')">${isFav ? '❤️' : '♡'}</div></div>`;
+        }
+
+        function toggleFav(id, path, tipo) {
+            const index = favorites.findIndex(f => f.id === id); if(index > -1) favorites.splice(index, 1); else favorites.push({id, path, tipo});
+            localStorage.setItem('dabo_favs', JSON.stringify(favorites)); render();
+        }
+
+        function updateFavRow() {
+            const sec = document.getElementById('favorites-section'); const row = document.getElementById('fav-row');
+            if(favorites.length > 0) { sec.classList.remove('hidden'); row.innerHTML = favorites.map(m => `<div class="movie-card" onclick="detectarTipo(${m.id}, '${m.tipo}')" style="background-image:url('https://image.tmdb.org/t/p/w400${m.path}')"><div class="fav-btn" onclick="event.stopPropagation(); toggleFav(${m.id}, '${m.path}', '${m.tipo}')">❤️</div></div>`).join('');
+            } else { sec.classList.add('hidden'); }
+        }
+
+        function detectarTipo(id, tipo) { if(tipo === 'tv' || tipo === 'series') cargarSerie(id); else prepararVideo(id, 'movie'); }
+
+        async function cargarSerie(id) {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API}&language=es-ES`);
+            const data = await res.json(); document.getElementById('series-overlay').style.display = 'flex';
+            document.getElementById('series-title').innerText = data.name; bg.style.backgroundImage = `url('https://image.tmdb.org/t/p/original${data.backdrop_path}')`;
+            document.getElementById('series-content').innerHTML = (data.seasons || []).filter(s => s.season_number > 0).map(s => `<div class="glass-panel mb-4 flex justify-between items-center" onclick="cargarEpisodios(${id}, ${s.season_number})"><div><h4 class="text-gold font-black uppercase text-sm">${s.name}</h4><p class="text-[10px] text-gray-400">${s.episode_count} Episodios</p></div><span class="text-gold">❯</span></div>`).join('');
+        }
+
+        async function cargarEpisodios(tvId, sNum) {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}/season/${sNum}?api_key=${API}&language=es-ES`);
+            const data = await res.json();
+            document.getElementById('series-content').innerHTML = `<button onclick="cargarSerie(${tvId})" class="text-gold text-[10px] mb-6 border border-gold/30 px-4 py-1 rounded-full">← VOLVER</button>` + 
+            data.episodes.map(e => `<div class="p-4 border-b border-white/5" onclick="prepararVideo(${tvId}, 'tv', ${sNum}, ${e.episode_number})"><p class="text-[11px] font-bold">${e.episode_number}. ${e.name}</p></div>`).join('');
+        }
+
+        function prepararVideo(id, tipo, s=1, e=1) {
+            document.getElementById('series-overlay').style.display = 'none'; document.getElementById('video-overlay').style.display = 'flex';
+            document.getElementById('player-frame').innerHTML = `<button onclick="animarPlay('${id}','${tipo}',${s},${e})" id="play-btn-main" class="bg-gold text-black font-black px-16 py-8 rounded-full text-2xl shadow-[0_0_60px_rgba(212,175,55,0.5)] z-20">PLAY 🎬</button><div id="actual-video" class="w-full h-full hidden"></div>`;
+        }
+
+        function animarPlay(id, tipo, s, e) {
+            const blast = document.createElement('div'); blast.className = 'gold-blast'; document.getElementById('player-frame').appendChild(blast);
+            setTimeout(() => {
+                audio.pause(); bg.style.opacity = "0"; document.getElementById('play-btn-main').classList.add('hidden');
+                const v = document.getElementById('actual-video'); v.classList.remove('hidden');
+                v.innerHTML = `<iframe src="${tipo === 'movie' ? `https://vidsrc.icu/embed/movie/${id}` : `https://vidsrc.icu/embed/tv/${id}/${s}/${e}`}" class="w-full h-full" allowfullscreen allow="autoplay"></iframe>`;
+                let p = 0; const interval = setInterval(() => { if(document.getElementById('video-overlay').style.display === 'none') { clearInterval(interval); return; } p += 0.1; document.getElementById('progress-bar').style.width = (p % 100) + "%"; }, 1000);
+            }, 600);
+        }
+
+        function cerrarVideo() { audio.play(); bg.style.opacity = "1"; document.getElementById('video-overlay').style.display = 'none'; document.getElementById('player-frame').innerHTML = ''; document.getElementById('progress-bar').style.width = "0%"; }
+        function buscar(q) { if(q.length < 3) { if(q.length === 0) render(); return; } fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API}&query=${q}&language=es-ES`).then(r => r.json()).then(d => { document.getElementById('catalog').innerHTML = `<div class="px-6 mb-8"><button onclick="render()" class="text-gold text-[10px] border border-gold/40 px-6 py-2 rounded-full">← Volver</button></div><div class="video-row">${d.results.filter(m=>m.poster_path).map(m => cardHTML(m)).join('')}</div>`; }); }
     </script>
 </body>
 </html>
