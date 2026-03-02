@@ -18,21 +18,17 @@
 </head>
 <body>
 
-    <div id="bienvenida">
-        <div class="caja">
-            <p style="font-size: 1.2rem; line-height: 1.6; font-style: italic;">
-                “Bienvenido a <span class="oro">Dabo Vision Global</span> el Futuro<br>
-                Disfruta De tus Gustos Favoritos<br>
-                Gracias 🙏”
-            </p>
-            <button onclick="document.getElementById('bienvenida').style.display='none'">ENTRAR</button>
-        </div>
+    
+<div id="bienvenida" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:9999;">
+    <div style="border:2px solid #D4AF37; padding:30px; border-radius:20px; text-align:center; width:80%;">
+        <p style="color:white; font-size:1.2rem;">
+            “Bienvenido a <span style="color:#D4AF37;">Dabo Vision Global</span> el Futuro<br>
+            Disfruta De tus Gustos Favoritos<br>
+            Gracias 🙏”
+        </p>
+        <button onclick="this.parentElement.parentElement.style.display='none'" style="background:#D4AF37; color:black; padding:10px 20px; border-radius:50px; font-weight:bold; border:none; margin-top:20px;">ENTRAR</button>
     </div>
-
-    <h1 class="oro" style="margin-top: 100px;">DABO VISION GLOBAL</h1>
-    <div id="peliculas" style="display: flex; gap: 10px; overflow-x: auto; padding: 20px;">
-        <p>Cargando cartelera VIP para Dieyna...</p>
-    </div>
+</div>
 
     <script>
         // Este código trae las películas automáticamente
